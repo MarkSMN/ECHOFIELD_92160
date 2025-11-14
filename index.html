@@ -245,14 +245,14 @@
       let params = {
         // Core Parameters
         scale: 0.0,
-        density: 0.0,
+        density: 0.15,          // Set slightly on so N button shows variation
         alignment: 0.0,
         coherence: 0.0,
         disruption: 0.0,
         symmetry: 0.0,
         
         // Structural Matrix
-        progression: 0.0,
+        progression: 0.10,      // Subtle gradient shift makes N button visible
         rhythm: 0.0,
         rhythmInterval: 12,
         stagger: 0.0,
@@ -516,12 +516,12 @@
       function resetParameters() {
         params = {
           scale: 0.0,
-          density: 0.0,
+          density: 0.15,
           alignment: 0.0,
           coherence: 0.0,
           disruption: 0.0,
           symmetry: 0.0,
-          progression: 0.0,
+          progression: 0.10,
           rhythm: 0.0,
           rhythmInterval: 12,
           stagger: 0.0,
