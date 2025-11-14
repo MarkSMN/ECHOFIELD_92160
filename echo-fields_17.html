@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <style>
+    body { 
+      margin: 0; 
+      display: flex; 
+      flex-direction: column;
+      align-items: center; 
+      justify-content: center;
+      min-height: 100vh;
+      background: #ffffff;
+      font-family: 'Courier New', monospace;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .container {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 30px;
+      width: 100%;
+      max-width: 100%;
+      height: 100%;
+    }
+    .canvas-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0px;
+      padding-top: 80px;
+    }
+    .title {
+      color: #666;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-weight: normal;
+      margin-bottom: 20px;
+    }
+    canvas {
+      border: 1px solid #333;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+    }
+    .controls-panel {
+      width: 340px;
+      background: #1a1a1a;
+      padding: 30px;
+      border-radius: 0px;
+      border: 1px solid #2a2a2a;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .control-section {
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .control-section:last-child {
+      border-bottom: none;
+    }
+    .section-title {
+      color: #999;
+      font-size: 9px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+      opacity: 0.6;
+    }
+    .info-display {
+      background: #0a0a0a;
+      padding: 16px;
+      border-radius: 0px;
+      font-size: 10px;
+      line-height: 1.9;
+      color: #666;
+      margin-bottom: 18px;
+      border: 1px solid #222;
+      font-family: 'Courier New', monospace;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    .info-label {
+      color: #555;
+    }
+    .info-value {
+      color: #999;
+      font-weight: bold;
+    }
+    .slider-group {
+      margin-bottom: 18px;
+    }
+    .slider-label {
+      color: #666;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .slider-name {
+      font-weight: normal;
+    }
+    .slider-value {
+      color: #999;
+      font-weight: bold;
+      font-size: 10px;
+    }
+    input[type="range"] {
+      width: 100%;
+      height: 2px;
+      border-radius: 0px;
+      background: #2a2a2a;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #666;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: #999;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #666;
+      cursor: pointer;
+      border: none;
+    }
+    .color-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .color-label {
+      font-size: 9px;
+      font-weight: normal;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      flex: 1;
+    }
+    .color-swatch {
+      width: 60px;
+      height: 30px;
+      border-radius: 4px;
+      border: 1px solid #333;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .color-swatch:hover {
+      border-color: #555;
+    }
+    input[type="color"] {
+      opacity: 0;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    .action-btn {
+      background: #1a1a1a;
+      color: #666;
+      border: 1px solid #333;
+      padding: 13px 18px;
+      border-radius: 0px;
+      cursor: pointer;
+      font-size: 9px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      transition: all 0.2s;
+      width: 100%;
+      margin-top: 10px;
+      font-family: 'Courier New', monospace;
+    }
+    .action-btn:hover {
+      background: #222;
+      color: #999;
+      border-color: #444;
+    }
+    .action-btn.primary {
+      background: #1a1a1a;
+      color: #999;
+      border-color: #444;
+    }
+    .action-btn.primary:hover {
+      background: #252525;
+      color: #ccc;
+    }
+    .keyboard-hint {
+      color: #666;
+      font-size: 8px;
+      line-height: 1.7;
+      margin-bottom: 14px;
+      padding: 10px;
+      background: #0a0a0a;
+      border-radius: 0px;
+      border: 1px solid #222;
+    }
+    .keyboard-hint strong {
+      color: #999;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    let sketch = function(p) {
+      const TOTAL_LINES = 60;
+      const LINE_WIDTH = 48;
+      const VALID_LENGTHS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48];
+      
+      const ORIGINAL_SCALE = 8;
+      const MIN_SCALE = 4;
+      const MAX_SCALE = 60;  // Canvas display width (48" × 60 = 2880px max)
+      let SCALE = ORIGINAL_SCALE;
+      let canvasRealWidth = LINE_WIDTH * SCALE;
+      let canvasRealHeight = TOTAL_LINES * SCALE;
+      
+      let colorA, colorB, grayColor;
+      let lines = [];
+      
+      // PARAMETRIC SYSTEM
+      // All sliders start at 0 (left) = pure gradient field
+      // Moving sliders right introduces complexity
+      let params = {
+        // Core Parameters
+        scale: 0.0,
+        density: 0.0,
+        alignment: 0.0,
+        coherence: 0.0,
+        disruption: 0.0,
+        symmetry: 0.0,
+        
+        // Structural Matrix
+        progression: 0.0,
+        rhythm: 0.0,
+        rhythmInterval: 12,
+        stagger: 0.0,
+        
+        // Brutalist Parameters
+        monolith: 0.0,
+        pillar: 0.0,
+        pillarWidth: 16,
+        bookend: 0.0,
+        minBandHeight: 8,      // Default to 8 lines minimum
+        
+        seed: 42
+      };
+      
+      let sliders = {};
+      let colorInputs = {};
+      let infoDisplay;
+      
+      function calculateDimensions() {
+        const windowWidth = window.innerWidth - 450;
+        const windowHeight = window.innerHeight - 120;
+        
+        const scaleByWidth = Math.floor(windowWidth / LINE_WIDTH);
+        const scaleByHeight = Math.floor(windowHeight / TOTAL_LINES);
+        
+        SCALE = Math.max(MIN_SCALE, Math.min(MAX_SCALE, Math.min(scaleByWidth, scaleByHeight)));
+        canvasRealWidth = LINE_WIDTH * SCALE;
+        canvasRealHeight = TOTAL_LINES * SCALE;
+      }
+      
+      window.addEventListener('resize', function() {
+        calculateDimensions();
+        p.resizeCanvas(canvasRealWidth, canvasRealHeight);
+        generateComposition();
+      });
+      
+      p.setup = function() {
+        calculateDimensions();
+        p.frameRate(30);
+        p.noLoop();
+        
+        const container = p.select('.container') || p.createDiv('');
+        container.class('container');
+        
+        const canvasContainer = p.createDiv('');
+        canvasContainer.class('canvas-container');
+        
+        const canvas = p.createCanvas(canvasRealWidth, canvasRealHeight);
+        canvasContainer.child(canvas);
+        container.child(canvasContainer);
+        
+        const controlsPanel = p.createDiv('');
+        controlsPanel.class('controls-panel');
+        container.child(controlsPanel);
+        
+        // TITLE at top of controls
+        const title = p.createDiv('ECHO FIELDS — 60×48');
+        title.class('title');
+        controlsPanel.child(title);
+        
+        // SYSTEM TELEMETRY
+        const infoSection = p.createDiv('');
+        infoSection.class('control-section');
+        const infoTitle = p.createDiv('System Telemetry');
+        infoTitle.class('section-title');
+        infoSection.child(infoTitle);
+        
+        infoDisplay = p.createDiv('');
+        infoDisplay.class('info-display');
+        infoDisplay.html('Initializing field...');
+        infoSection.child(infoDisplay);
+        
+        controlsPanel.child(infoSection);
+        
+        // FIELD GENERATOR
+        const navSection = p.createDiv('');
+        navSection.class('control-section');
+        const navTitle = p.createDiv('Field Generator');
+        navTitle.class('section-title');
+        navSection.child(navTitle);
+        
+        const keyboardHint = p.createDiv('Press <strong>N</strong> for new matrix seed');
+        keyboardHint.class('keyboard-hint');
+        navSection.child(keyboardHint);
+        
+        createSlider(navSection, 'seed', 'MATRIX SEED', 0, 10000, 1, params.seed);
+        
+        controlsPanel.child(navSection);
+        
+        // CHROMATIC MODULATION
+        const colorSection = p.createDiv('');
+        colorSection.class('control-section');
+        const colorTitle = p.createDiv('Chromatic Modulation');
+        colorTitle.class('section-title');
+        colorSection.child(colorTitle);
+        
+        const leftGroup = p.createDiv('');
+        leftGroup.class('color-group');
+        const leftLabel = p.createSpan('Primary Terminus');
+        leftLabel.class('color-label');
+        leftGroup.child(leftLabel);
+        const leftSwatch = p.createDiv('');
+        leftSwatch.class('color-swatch');
+        colorInputs.left = p.createInput('#1a3be0', 'color');
+        leftSwatch.child(colorInputs.left);
+        leftGroup.child(leftSwatch);
+        colorSection.child(leftGroup);
+        
+        const rightGroup = p.createDiv('');
+        rightGroup.class('color-group');
+        const rightLabel = p.createSpan('Secondary Terminus');
+        rightLabel.class('color-label');
+        rightGroup.child(rightLabel);
+        const rightSwatch = p.createDiv('');
+        rightSwatch.class('color-swatch');
+        colorInputs.right = p.createInput('#e9cda5', 'color');
+        rightSwatch.child(colorInputs.right);
+        rightGroup.child(rightSwatch);
+        colorSection.child(rightGroup);
+        
+        controlsPanel.child(colorSection);
+        
+        // PARTITIONING LOGIC
+        const paramSection = p.createDiv('');
+        paramSection.class('control-section');
+        const paramTitle = p.createDiv('Partitioning Logic');
+        paramTitle.class('section-title');
+        paramSection.child(paramTitle);
+        
+        createSlider(paramSection, 'scale', 'INTERVAL BIAS', 0, 1, 0.01, params.scale);
+        createSlider(paramSection, 'density', 'SUBDIVISION FACTOR', 0, 1, 0.01, params.density);
+        createSlider(paramSection, 'alignment', 'VERTICAL REGISTRATION', 0, 1, 0.01, params.alignment);
+        createSlider(paramSection, 'coherence', 'BAND PERSISTENCE', 0, 1, 0.01, params.coherence);
+        createSlider(paramSection, 'disruption', 'VARIANCE INJECTION', 0, 1, 0.01, params.disruption);
+        createSlider(paramSection, 'symmetry', 'BILATERAL CONSTRAINT', 0, 1, 0.01, params.symmetry);
+        
+        controlsPanel.child(paramSection);
+        
+        // FIELD DYNAMICS
+        const structSection = p.createDiv('');
+        structSection.class('control-section');
+        const structTitle = p.createDiv('Field Dynamics');
+        structTitle.class('section-title');
+        structSection.child(structTitle);
+        
+        createSlider(structSection, 'progression', 'GRADIENT INVERSION', 0, 1, 0.01, params.progression);
+        createSlider(structSection, 'rhythm', 'HARMONIC RECURRENCE', 0, 1, 0.01, params.rhythm);
+        createSlider(structSection, 'rhythmInterval', 'CADENCE PERIOD', 2, 30, 1, params.rhythmInterval, [2, 3, 4, 5, 6, 10, 12, 15, 20, 30]);
+        createSlider(structSection, 'stagger', 'HORIZONTAL OFFSET', 0, 1, 0.01, params.stagger);
+        
+        controlsPanel.child(structSection);
+        
+        // TECTONIC CONSTRAINTS
+        const brutSection = p.createDiv('');
+        brutSection.class('control-section');
+        const brutTitle = p.createDiv('Tectonic Constraints');
+        brutTitle.class('section-title');
+        brutSection.child(brutTitle);
+        
+        createSlider(brutSection, 'monolith', 'MONOLITHIC INSERTION', 0, 1, 0.01, params.monolith);
+        createSlider(brutSection, 'pillar', 'VERTICAL ANCHOR', 0, 1, 0.01, params.pillar);
+        createSlider(brutSection, 'pillarWidth', 'ANCHOR DIAMETER', 2, 24, 2, params.pillarWidth);
+        createSlider(brutSection, 'bookend', 'BILATERAL TERMINI', 0, 1, 0.01, params.bookend);
+        createSlider(brutSection, 'minBandHeight', 'MINIMUM STRATA', 1, 20, 1, params.minBandHeight);
+        
+        controlsPanel.child(brutSection);
+        
+        // SYSTEM OPERATIONS
+        const actionsSection = p.createDiv('');
+        actionsSection.class('control-section');
+        const actionsTitle = p.createDiv('System Operations');
+        actionsTitle.class('section-title');
+        actionsSection.child(actionsTitle);
+        
+        const resetBtn = p.createButton('Reset Parameters');
+        resetBtn.class('action-btn');
+        resetBtn.mousePressed(resetParameters);
+        actionsSection.child(resetBtn);
+        
+        const exportBtn = p.createButton('Export Modular Architecture');
+        exportBtn.class('action-btn primary');
+        exportBtn.mousePressed(exportBuildData);
+        actionsSection.child(exportBtn);
+        
+        const saveImageBtn = p.createButton('Save Proof');
+        saveImageBtn.class('action-btn');
+        saveImageBtn.mousePressed(saveImage);
+        actionsSection.child(saveImageBtn);
+        
+        controlsPanel.child(actionsSection);
+        
+        colorA = p.color('#1a3be0');
+        colorB = p.color('#e9cda5');
+        grayColor = p.color(50);
+        
+        leftSwatch.style('background-color', '#1a3be0');
+        rightSwatch.style('background-color', '#e9cda5');
+        
+        colorInputs.left.input(() => {
+          colorA = p.color(colorInputs.left.value());
+          leftSwatch.style('background-color', colorInputs.left.value());
+          p.redraw();
+        });
+        
+        colorInputs.right.input(() => {
+          colorB = p.color(colorInputs.right.value());
+          rightSwatch.style('background-color', colorInputs.right.value());
+          p.redraw();
+        });
+        
+        generateComposition();
+      };
+      
+      p.keyPressed = function() {
+        if (p.key === 'n' || p.key === 'N') {
+          params.seed = Math.floor(p.random(0, 10000));
+          sliders.seed.value(params.seed);
+          p.select('#seed-value').html(params.seed.toFixed(0));
+          generateComposition();
+          return false;
+        }
+      };
+      
+      function createSlider(parent, paramName, label, min, max, step, defaultValue, snapPoints = null) {
+        const sliderGroup = p.createDiv('');
+        sliderGroup.class('slider-group');
+        
+        const labelDiv = p.createDiv('');
+        labelDiv.class('slider-label');
+        const decimals = (paramName === 'seed' || paramName === 'rhythmInterval' || paramName === 'pillarWidth' || paramName === 'minBandHeight') ? 0 : 2;
+        labelDiv.html(`<span class="slider-name">${label}</span><span class="slider-value" id="${paramName}-value">${defaultValue.toFixed(decimals)}</span>`);
+        sliderGroup.child(labelDiv);
+        
+        const slider = p.createSlider(min, max, defaultValue, step);
+        sliders[paramName] = slider;
+        
+        slider.input(() => {
+          let value = slider.value();
+          
+          // Snap to specific values if provided (for rhythm interval)
+          if (snapPoints) {
+            let closest = snapPoints.reduce((prev, curr) => {
+              return (Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev);
+            });
+            if (Math.abs(closest - value) < 1.5) {
+              value = closest;
+              slider.value(value);
+            }
+          }
+          
+          params[paramName] = value;
+          const decimals = (paramName === 'seed' || paramName === 'rhythmInterval' || paramName === 'pillarWidth' || paramName === 'minBandHeight') ? 0 : 2;
+          p.select(`#${paramName}-value`).html(value.toFixed(decimals));
+          generateComposition();
+        });
+        
+        sliderGroup.child(slider);
+        parent.child(sliderGroup);
+      }
+      
+      function resetParameters() {
+        params = {
+          scale: 0.0,
+          density: 0.0,
+          alignment: 0.0,
+          coherence: 0.0,
+          disruption: 0.0,
+          symmetry: 0.0,
+          progression: 0.0,
+          rhythm: 0.0,
+          rhythmInterval: 12,
+          stagger: 0.0,
+          monolith: 0.0,
+          pillar: 0.0,
+          pillarWidth: 16,
+          bookend: 0.0,
+          minBandHeight: 8,
+          seed: 42
+        };
+        
+        Object.keys(sliders).forEach(key => {
+          sliders[key].value(params[key]);
+          const decimals = (key === 'seed' || key === 'rhythmInterval' || key === 'pillarWidth') ? 0 : 2;
+          p.select(`#${key}-value`).html(params[key].toFixed(decimals));
+        });
+        
+        generateComposition();
+      }
+      
+      function generateComposition() {
+        lines = [];
+        p.randomSeed(params.seed);
+        
+        let patternLibrary = [];
+        let previousLine = null;
+        let rhythmPattern = null;
+        let pillarState = null;
+        let currentBandPattern = null;  // Track current band pattern
+        let currentBandCount = 0;       // How many lines in current band
+        
+        for (let lineNum = 0; lineNum < TOTAL_LINES; lineNum++) {
+          let partition;
+          let shouldGenerateNew = false;
+          
+          // Check if we've met the minimum band height
+          let canChangeBand = currentBandCount >= params.minBandHeight;
+          
+          // MONOLITH: Probability of single [48] piece
+          if (p.random() < params.monolith && canChangeBand) {
+            partition = [48];
+            shouldGenerateNew = true;
+          }
+          // RHYTHM: Every N lines, reuse rhythm pattern
+          else if (params.rhythm > 0 && rhythmPattern && lineNum % params.rhythmInterval === 0 && p.random() < params.rhythm && canChangeBand) {
+            partition = [...rhythmPattern];
+            shouldGenerateNew = true;
+          }
+          // COHERENCE: Copy previous line (or continue current band)
+          else if (previousLine && (p.random() < params.coherence || !canChangeBand)) {
+            partition = [...previousLine];
+            // Don't mark as new if we're forced to continue the band
+            shouldGenerateNew = canChangeBand && p.random() < (1 - params.coherence);
+          }
+          // ALIGNMENT: Use pattern from library
+          else if (patternLibrary.length > 0 && p.random() < params.alignment && canChangeBand) {
+            partition = p.random(patternLibrary).slice();
+            shouldGenerateNew = true;
+          }
+          // Generate new partition
+          else if (canChangeBand) {
+            partition = generatePartition(lineNum);
+            shouldGenerateNew = true;
+          }
+          // Forced to continue current band
+          else {
+            partition = previousLine ? [...previousLine] : generatePartition(lineNum);
+          }
+          
+          // DISRUPTION: Break pattern (only if band height met)
+          if (p.random() < params.disruption && canChangeBand) {
+            partition = generatePartition(lineNum);
+            shouldGenerateNew = true;
+          }
+          
+          // Track band changes
+          if (shouldGenerateNew || lineNum === 0) {
+            currentBandPattern = [...partition];
+            currentBandCount = 1;
+          } else {
+            currentBandCount++;
+          }
+          
+          // PILLAR: Force specific width to align vertically
+          if (params.pillar > 0 && p.random() < params.pillar) {
+            partition = applyPillar(partition);
+          }
+          
+          // BOOKEND: Enforce symmetric outer pieces
+          if (params.bookend > 0 && p.random() < params.bookend) {
+            partition = applyBookend(partition);
+          }
+          
+          // Store rhythm pattern at interval boundaries
+          if (params.rhythm > 0 && lineNum % params.rhythmInterval === 0) {
+            rhythmPattern = [...partition];
+          }
+          
+          // Store in library
+          if (patternLibrary.length < 10 && p.random() < 0.3) {
+            patternLibrary.push([...partition]);
+          }
+          
+          // STAGGER: Apply offset to alternating lines
+          if (params.stagger > 0 && lineNum % 2 === 1) {
+            partition = applyStagger(partition);
+          }
+          
+          lines.push(partition);
+          previousLine = partition;
+        }
+        
+        updateInfoDisplay();
+        p.redraw();
+      }
+      
+      function generatePartition(lineNum = 0) {
+        // SYMMETRY
+        if (p.random() < params.symmetry) {
+          let half = [];
+          let halfTarget = LINE_WIDTH / 2;
+          let halfRemaining = halfTarget;
+          
+          while (halfRemaining > 0) {
+            let length = selectLength(halfRemaining, lineNum);
+            half.push(length);
+            halfRemaining -= length;
+          }
+          
+          return [...half, ...half.slice().reverse()];
+        }
+        
+        // Regular partition
+        let partition = [];
+        let remaining = LINE_WIDTH;
+        
+        while (remaining > 0) {
+          let length = selectLength(remaining, lineNum);
+          partition.push(length);
+          remaining -= length;
+        }
+        
+        return partition;
+      }
+      
+      function selectLength(maxLength, lineNum = 0) {
+        let validLengths = VALID_LENGTHS.filter(l => l <= maxLength);
+        if (validLengths.length === 0) return maxLength;
+        
+        // PROGRESSION
+        let progressionFactor = lineNum / (TOTAL_LINES - 1);
+        let effectiveScale = params.scale;
+        let effectiveDensity = params.density;
+        
+        if (params.progression > 0) {
+          effectiveScale = p.lerp(params.scale, 1 - params.scale, progressionFactor * params.progression);
+          effectiveDensity = p.lerp(params.density, 1 - params.density, progressionFactor * params.progression);
+        }
+        
+        // SCALE
+        let biasedLengths;
+        if (effectiveScale < 0.3) {
+          biasedLengths = validLengths.filter(l => l <= 8);
+        } else if (effectiveScale < 0.7) {
+          biasedLengths = validLengths.filter(l => l >= 8 && l <= 16);
+        } else {
+          biasedLengths = validLengths.filter(l => l >= 16);
+        }
+        
+        if (biasedLengths.length === 0) biasedLengths = validLengths;
+        
+        // DENSITY
+        if (effectiveDensity > 0.7) {
+          biasedLengths = biasedLengths.filter(l => l <= 12);
+          if (biasedLengths.length === 0) biasedLengths = validLengths.filter(l => l <= 12);
+          if (biasedLengths.length === 0) biasedLengths = validLengths;
+        } else if (effectiveDensity < 0.3) {
+          biasedLengths = biasedLengths.filter(l => l >= 16);
+          if (biasedLengths.length === 0) biasedLengths = validLengths.filter(l => l >= 16);
+          if (biasedLengths.length === 0) biasedLengths = validLengths.filter(l => l >= 12);
+          if (biasedLengths.length === 0) biasedLengths = validLengths;
+          
+          if (effectiveDensity < 0.2) {
+            return Math.max(...biasedLengths);
+          }
+        }
+        
+        return p.random(biasedLengths);
+      }
+      
+      function applyStagger(partition) {
+        let totalLength = partition.reduce((sum, len) => sum + len, 0);
+        let offsetAmount = Math.round(params.stagger * (totalLength / 2));
+        
+        if (offsetAmount === 0) return partition;
+        
+        let accumulated = 0;
+        let splitIndex = 0;
+        
+        for (let i = 0; i < partition.length; i++) {
+          accumulated += partition[i];
+          if (accumulated >= offsetAmount) {
+            splitIndex = i;
+            break;
+          }
+        }
+        
+        if (accumulated > offsetAmount && splitIndex < partition.length) {
+          let remainder = accumulated - offsetAmount;
+          let splitPiece = partition[splitIndex];
+          let before = partition.slice(0, splitIndex);
+          let after = partition.slice(splitIndex + 1);
+          return [...after, ...before, splitPiece];
+        } else {
+          let before = partition.slice(0, splitIndex + 1);
+          let after = partition.slice(splitIndex + 1);
+          return [...after, ...before];
+        }
+      }
+      
+      function applyPillar(partition) {
+        // Force pillarWidth to appear in partition
+        let targetWidth = params.pillarWidth;
+        
+        // Check if partition already contains the pillar width
+        if (partition.includes(targetWidth)) return partition;
+        
+        // Insert pillar width somewhere in the partition
+        let remaining = LINE_WIDTH - targetWidth;
+        let newPartition = [targetWidth];
+        
+        while (remaining > 0) {
+          let validLengths = VALID_LENGTHS.filter(l => l <= remaining);
+          if (validLengths.length === 0) {
+            newPartition.push(remaining);
+            break;
+          }
+          let length = p.random(validLengths);
+          newPartition.push(length);
+          remaining -= length;
+        }
+        
+        // Randomly position the pillar
+        if (p.random() < 0.5) {
+          newPartition.sort(() => p.random() - 0.5);
+        }
+        
+        return newPartition;
+      }
+      
+      function applyBookend(partition) {
+        // Create symmetric outer pieces
+        let remaining = LINE_WIDTH;
+        let bookendSize = p.random([8, 12, 16, 20]);
+        
+        if (bookendSize * 2 >= LINE_WIDTH) {
+          bookendSize = Math.floor(LINE_WIDTH / 4) * 2;
+        }
+        
+        remaining -= bookendSize * 2;
+        
+        let center = [];
+        while (remaining > 0) {
+          let validLengths = VALID_LENGTHS.filter(l => l <= remaining);
+          if (validLengths.length === 0) {
+            center.push(remaining);
+            break;
+          }
+          let length = p.random(validLengths);
+          center.push(length);
+          remaining -= length;
+        }
+        
+        return [bookendSize, ...center, bookendSize];
+      }
+      
+      function updateInfoDisplay() {
+        let totalSegments = 0;
+        let uniqueLengths = new Set();
+        let monolithCount = 0;
+        
+        lines.forEach(line => {
+          totalSegments += line.length;
+          line.forEach(length => uniqueLengths.add(length));
+          if (line.length === 1 && line[0] === 48) monolithCount++;
+        });
+        
+        let avgSegmentsPerLine = (totalSegments / TOTAL_LINES).toFixed(1);
+        let minSegments = Math.min(...lines.map(l => l.length));
+        let maxSegments = Math.max(...lines.map(l => l.length));
+        
+        let html = '';
+        html += `<div class="info-row"><span class="info-label">Total Segments</span><span class="info-value">${totalSegments}</span></div>`;
+        html += `<div class="info-row"><span class="info-label">Avg Per Line</span><span class="info-value">${avgSegmentsPerLine}</span></div>`;
+        html += `<div class="info-row"><span class="info-label">Range</span><span class="info-value">${minSegments}-${maxSegments}</span></div>`;
+        html += `<div class="info-row"><span class="info-label">Monoliths</span><span class="info-value">${monolithCount}</span></div>`;
+        html += `<div class="info-row"><span class="info-label">Unique Lengths</span><span class="info-value">${uniqueLengths.size}</span></div>`;
+        
+        infoDisplay.html(html);
+      }
+      
+      function exportBuildData() {
+        let output = '';
+        output += '═'.repeat(70) + '\n';
+        output += 'ECHO FIELDS — BUILD SPECIFICATION\n';
+        output += '═'.repeat(70) + '\n\n';
+        
+        output += 'SYSTEM: 60 lines × 48" wide (each line 1" tall)\n';
+        output += 'Each line is a partition of 48" into 2" intervals\n';
+        output += 'Line 1 = BOTTOM, Line 60 = TOP\n\n';
+        
+        output += 'PARTITIONING LOGIC:\n';
+        output += '─'.repeat(70) + '\n';
+        output += `INTERVAL BIAS         : ${params.scale.toFixed(3)}\n`;
+        output += `SUBDIVISION FACTOR    : ${params.density.toFixed(3)}\n`;
+        output += `VERTICAL REGISTRATION : ${params.alignment.toFixed(3)}\n`;
+        output += `BAND PERSISTENCE      : ${params.coherence.toFixed(3)}\n`;
+        output += `VARIANCE INJECTION    : ${params.disruption.toFixed(3)}\n`;
+        output += `BILATERAL CONSTRAINT  : ${params.symmetry.toFixed(3)}\n\n`;
+        
+        output += 'FIELD DYNAMICS:\n';
+        output += '─'.repeat(70) + '\n';
+        output += `GRADIENT INVERSION    : ${params.progression.toFixed(3)}\n`;
+        output += `HARMONIC RECURRENCE   : ${params.rhythm.toFixed(3)}\n`;
+        output += `CADENCE PERIOD        : ${params.rhythmInterval}\n`;
+        output += `HORIZONTAL OFFSET     : ${params.stagger.toFixed(3)}\n\n`;
+        
+        output += 'TECTONIC CONSTRAINTS:\n';
+        output += '─'.repeat(70) + '\n';
+        output += `MONOLITHIC INSERTION  : ${params.monolith.toFixed(3)}\n`;
+        output += `VERTICAL ANCHOR       : ${params.pillar.toFixed(3)}\n`;
+        output += `ANCHOR DIAMETER       : ${params.pillarWidth}"\n`;
+        output += `BILATERAL TERMINI     : ${params.bookend.toFixed(3)}\n`;
+        output += `MINIMUM STRATA        : ${params.minBandHeight} lines\n`;
+        output += `MATRIX SEED           : ${params.seed}\n\n`;
+        
+        let lengthCounts = {};
+        lines.forEach(line => {
+          line.forEach(length => {
+            lengthCounts[length] = (lengthCounts[length] || 0) + 1;
+          });
+        });
+        
+        output += '═'.repeat(70) + '\n';
+        output += 'BILL OF MATERIALS\n';
+        output += '═'.repeat(70) + '\n';
+        
+        Object.keys(lengthCounts).sort((a, b) => parseInt(b) - parseInt(a)).forEach(length => {
+          output += `${String(length).padStart(2)}" wide × 1" tall : ${String(lengthCounts[length]).padStart(4)} pieces\n`;
+        });
+        
+        output += '\n' + '═'.repeat(70) + '\n';
+        output += 'LINE-BY-LINE SPECIFICATION\n';
+        output += '═'.repeat(70) + '\n\n';
+        
+        lines.forEach((line, idx) => {
+          let lineNum = idx + 1;
+          output += `LINE ${String(lineNum).padStart(2)} │ `;
+          output += line.join(' + ');
+          output += ` │ (${line.length} pieces)\n`;
+        });
+        
+        output += '\n' + '═'.repeat(70) + '\n';
+        output += 'JSON DATA\n';
+        output += '═'.repeat(70) + '\n';
+        output += JSON.stringify({ 
+          system: {
+            totalLines: TOTAL_LINES,
+            lineWidth: LINE_WIDTH,
+            lineHeight: 1,
+            validLengths: VALID_LENGTHS,
+            units: 'inches'
+          },
+          parameters: params,
+          lines: lines 
+        }, null, 2);
+        
+        let blob = new Blob([output], { type: 'text/plain' });
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = `echo-fields-${params.seed}-${Date.now()}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+      
+      function saveImage() {
+        p.saveCanvas(`echo-fields-${params.seed}-${Date.now()}`, 'png');
+      }
+      
+      p.draw = function() {
+        p.background(255);
+        p.noSmooth(); // Disable anti-aliasing to prevent gaps
+        
+        const CHECKER_SUBDIVISIONS = 4;
+        const BASE_CHECKER_SIZE = SCALE / CHECKER_SUBDIVISIONS;
+        
+        for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+          let line = lines[lineIdx];
+          let yPosition = (TOTAL_LINES - 1 - lineIdx);
+          let y = yPosition * SCALE;
+          let h = SCALE;
+          
+          let currentX = 0;
+          
+          line.forEach(segmentWidth => {
+            let x = currentX * SCALE;
+            let w = segmentWidth * SCALE;
+            
+            let squaresAcross = Math.ceil(w / BASE_CHECKER_SIZE);
+            let squaresDown = Math.ceil(h / BASE_CHECKER_SIZE);
+            
+            for (let i = 0; i < squaresAcross; i++) {
+              for (let j = 0; j < squaresDown; j++) {
+                let squareX = x + (i * BASE_CHECKER_SIZE);
+                let squareY = y + (j * BASE_CHECKER_SIZE);
+                
+                let absoluteX = Math.floor(currentX * CHECKER_SUBDIVISIONS) + i;
+                let absoluteY = Math.floor(yPosition * CHECKER_SUBDIVISIONS) + j;
+                
+                if ((absoluteX + absoluteY) % 2 === 0) {
+                  p.fill(grayColor);
+                } else {
+                  let inter = i / squaresAcross;
+                  let c = p.lerpColor(colorA, colorB, inter);
+                  p.fill(c);
+                }
+                
+                p.noStroke();
+                // Add 0.5px overlap to prevent gaps at fractional scales
+                p.rect(squareX, squareY, BASE_CHECKER_SIZE + 0.5, BASE_CHECKER_SIZE + 0.5);
+              }
+            }
+            
+            currentX += segmentWidth;
+          });
+        }
+      };
+    };
+
+    new p5(sketch);
+  </script>
+</body>
+</html>
